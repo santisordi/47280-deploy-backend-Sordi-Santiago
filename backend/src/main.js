@@ -10,6 +10,7 @@ import initializePassport from './config/passport.js';
 import router from './router/main.routes.js';
 import errorHandler from './middlewares/errors/errorHandler.js';
 import { logger, addLogger } from './utils/logger.js';
+import cors from 'cors';
 
 // import multer from 'multer';
 // import { userModel } from './models/users.model.js';
