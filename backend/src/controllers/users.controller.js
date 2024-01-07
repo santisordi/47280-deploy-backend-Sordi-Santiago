@@ -4,6 +4,7 @@ import { sendRecoveryEmail } from "../config/nodemailer.js";
 import { validatePassword } from "../utils/bcrypt.js";
 import { logger } from "../utils/logger.js";
 import cartModel from "../models/carts.models.js";
+import 'dotenv/config.js';
 
 const userGet = async (req, res) => {   
     try {

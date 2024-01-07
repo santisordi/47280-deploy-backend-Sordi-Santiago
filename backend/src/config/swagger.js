@@ -1,7 +1,6 @@
 import { __dirname } from "../path.js";
 import swaggerJSDoc from 'swagger-jsdoc';
 
-
 const swaggerOptions = {
     definition:{
         openapi:'3.1.0',

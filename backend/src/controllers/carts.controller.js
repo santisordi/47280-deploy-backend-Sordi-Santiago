@@ -2,6 +2,7 @@ import cartModel from '../models/carts.models.js';
 import { logger } from '../utils/logger.js';
 import productsModel from '../models/products.model.js';
 import { userModel } from '../models/users.model.js';
+import 'dotenv/config.js';
 // import productsModel from '../models/products.model.js';
 
 //Get Carts 

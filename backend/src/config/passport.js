@@ -5,7 +5,7 @@ import jwt from 'passport-jwt';
 import { createHash, validatePassword } from "../utils/bcrypt.js";
 import { userModel } from "../models/users.model.js";
 import {logger} from '../utils/logger.js';
-
+import 'dotenv/config.js';
 
  //Defino estrategia (los mensajes de error se manejan en la ruta, aca se ven los msj html )
  const LocalStrategy = local.Strategy;

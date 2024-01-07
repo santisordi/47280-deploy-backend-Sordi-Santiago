@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 import { logger } from "../utils/logger.js"
-
-
+import 'dotenv/config.js';
 
 //Conexion Node Mailer
 const transporter= nodemailer.createTransport({

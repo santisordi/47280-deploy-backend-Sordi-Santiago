@@ -15,7 +15,7 @@ export const  NewProduct = () =>{
       let token = null
       for (const cookie of cookieArray) {
           const [name, value] = cookie.split("=")
-          if (name == "jwtToken") {
+          if (name === "jwtToken") {
               token = value
               break
           }

@@ -11,9 +11,7 @@ import router from './router/main.routes.js';
 import errorHandler from './middlewares/errors/errorHandler.js';
 import { logger, addLogger } from './utils/logger.js';
 import cors from 'cors';
-
-// import multer from 'multer';
-// import { userModel } from './models/users.model.js';
+import 'dotenv/config.js';
 
 const whiteList = ['http://localhost:3001'];
 
