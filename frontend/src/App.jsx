@@ -1,44 +1,39 @@
-import './App.css';
-import Cart from './components/Cart';
-import Destacados from './components/Destacados';
-import Error404 from './components/Error404';
-import Footer from './components/Footer';
-import ItemDetailContainer from './components/ItemDetailContainer';
-import ItemListContainer from './components/ItemListContainer';
-import NavBar from './components/NavBar';
-import { Login } from './components/Login';
-import { Register } from './components/Register';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import CartContextProvider from './components/context/CartContext';
-import Checkout from './components/Checkout';
-import FinalPag from './components/FinalPag';
-import { NewProduct } from './components/newProduct';
+import React from 'react';
+import './App.css'
 
+//Contexts
+import { UserProvider } from './hooks/UserContext';
+import { CartProvider } from './hooks/CartContext';
+
+//RRD
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
+//Components
+import Navbar from './components/Navbar'
+import Homepage from './components/Homepage'
+import Login from './components/Login'
+import Register from './components/Register'
+import Cart from './components/Cart';
 
 function App() {
+
   return (
-    <div>
-      <CartContextProvider>
-        <BrowserRouter>
-          <NavBar />
-          <Routes>
-            <Route path={"/"} element={<ItemListContainer />} />
-            <Route path={"/category/:id"} element={<ItemListContainer />} />
-            <Route path={"/item/:id"} element={<ItemDetailContainer />} />
-            <Route path={"/destacados"} element={<Destacados />} />
-            <Route path={"/cart"} element={<Cart />}/>
-            <Route path={"/checkout"} element={<Checkout />} />
-            <Route path={"/FinalPag/:orderId"} element={<FinalPag />} />
-            <Route path={"/login"} element={<Login />} />
-            <Route path={"/register"} element={<Register />} />
-            <Route path={"/newProduct"} element={<NewProduct />} />
-            <Route path={"/*"} element={<Error404 />} />
-          </Routes>
-          <Footer />
-        </BrowserRouter>
-      </CartContextProvider>
-    </div>
-  );
+    <>
+      <Router>
+        <UserProvider>
+          <CartProvider>
+            <Navbar />
+            <Routes>
+              <Route path='/' element={<Homepage />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+              <Route path='/cart' element={<Cart />} />
+            </Routes>
+          </CartProvider>
+        </UserProvider>
+      </Router >
+    </>
+  )
 }
 
-export default App;
+export default App

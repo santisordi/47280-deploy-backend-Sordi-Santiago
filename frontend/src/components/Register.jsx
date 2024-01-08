@@ -1,60 +1,119 @@
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { TextField, Button, Paper, Typography, Container, CssBaseline, Alert } from '@mui/material';
 
-export const  Register = () =>{
-  const formRef = useRef(null); // Captura la referencia del formulario
-  const navigate = useNavigate()
+//RRD
+import { useNavigate, Link } from 'react-router-dom';
 
-  const handleSbmit =  async (e) => { //esto es para reemplasar el usestate y hacerlo mas rapido y simple
-      e.preventDefault(); 
-      const dataForm = new FormData(formRef.current);//transforma la data del form html en un objeto iterable
-      const data = Object.fromEntries(dataForm);  //dado un objeto iterator me lo transforma en una simple
-      
-      const response = await fetch('http://localhost:3000/api/session/register', {
-          method:'POST',    
-          headers: {
-                  'Content-type': 'application/json',
-              },
-              body: JSON.stringify(data)
-          });
+const Register = () => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [age, setAge] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
-          if (response.status === 200){
-              const datos = await response.json();
-              console.log(datos);  
-              navigate('/login');  
-          } else {
-              console.log('Registro invalido')
-          };
-  };
+    const navigate = useNavigate();
 
-  return (
-         <div className="text-center my-5">
-            <div className="container-fluid">
-                <h2>Formulario de Registro</h2>
-                <form onSubmit={handleSbmit} ref={formRef}>
-                    <div className="mb-3">
-                        <label htmlFor="first_name">Ingrese su nombre: </label>
-                        <input type="text" name='first_name' />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="last_name">Ingrese su apellido: </label>
-                        <input type="text" name='last_name' />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="age">Ingrese su edad: </label>
-                        <input type="number" name='age' />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="email">Ingrese su email:</label>
-                        <input type="mail" name='email' />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="password">Ingrese su contraseña:</label>
-                        <input type="password" name='password' />
-                    </div>
-                    <button type='submit' className='btn btn-dark'>Registrar</button>
-                </form>
-                </div>
-              </div>        
-  );
+    const handleRegister = async () => {
+        setIsLoading(true);
+        setError("");
+
+        if (firstName === '' || lastName === '' || email === '' || password === '' || age === '') {
+            setError("Todos los campos son obligatorios");
+            setIsLoading(false)
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:3000/api/session/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email, password: password, age: age }),
+            });
+
+            if (response.ok) {
+                navigate('/login');
+            } else {
+                // Handle registration failure (username already exists, etc.)
+                console.error('Registration failed!');
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <Container component="main" maxWidth="xs" style={{ marginTop: '1.2rem' }}>
+                <CssBaseline />
+                {error && <Alert style={{ marginTop: '1.2rem' }} severity="error">{error}</Alert>}
+                <Paper elevation={3} style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1.2rem' }}>
+                    <Typography variant="h5">Registrarse</Typography>
+                    <TextField
+                        label="Nombre"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                    />
+                    <TextField
+                        label="Apellido"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                    />
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        label="Password"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <TextField
+                        label="Edad"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        type="number"
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={handleRegister}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Registrando...' : 'Registrarse'}
+                    </Button>
+                    <Typography variant="body2" style={{ marginTop: '10px' }}>
+                        Ya tienes una cuenta?{' '}
+                        <Link to="/login" style={{ color: 'blue' }}>
+                            Inicia sesion
+                        </Link>
+                    </Typography>
+                </Paper>
+            </Container>
+        </>
+    );
 };
+
+export default Register;

@@ -1,28 +1,65 @@
-* {
-    font-family: 'Roboto', sans-serif;
-    padding: 0;
-    margin: 0;
+/* Estilos para el contenedor principal */
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  background-color: #222; /* Fondo oscuro */
+  color: #fff; /* Texto blanco */
 }
 
-.navbar-brand img{
-    width: 120px;
+/* Estilos para el logotipo */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
 }
 
-.navbar-brand{
-    margin-right: 0;
+/* Efecto de sombra al pasar el ratón sobre el logotipo */
+.logo:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 99, 71, 0.7)); /* Rojo claro */
 }
 
-.navbar-nav {
-    align-items: center;
+/* Efecto de rotación en el logotipo React */
+.logo.react:hover {
+  filter: drop-shadow(0 0 10px rgba(30, 83, 255, 0.045)); /* Azul claro */
 }
 
-.navbar .navbar-nav .nav-link{
-    font-size: 1.1em;
+/* Animación de rotación del logotipo */
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-@media screen and (min-width:992px) {
-    .navbar-brand img{
-        width: 250px;
-        padding: 0 1rem;
-    }
+/* Aplicar animación de rotación a la segunda instancia del logotipo */
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Estilos para las tarjetas */
+.card {
+  padding: 2em;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); /* Sombra más pronunciada */
+  border-radius: 10px;
+  margin: 1em;
+  background-color: #333; /* Fondo gris oscuro */
+}
+
+/* Color de texto para enlaces informativos */
+.read-the-docs {
+  color: #bbb; /* Gris claro para texto informativo */
+  font-style: italic;
+}
+
+/* Añadir una transición a los enlaces */
+.read-the-docs:hover {
+  color: #ddd; /* Cambiar color al pasar el ratón */
+  transition: color 300ms;
 }

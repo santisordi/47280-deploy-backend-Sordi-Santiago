@@ -1,68 +1,104 @@
-import CartWidget from "./CartWidget";
-import { NavLink, useNavigate } from "react-router-dom";
-const LogoMatePava = "/assets/images/1.png"
+import React, { useEffect, useState } from 'react'
 
-const NavBar = () => {
+//MUI
+import { AppBar, Toolbar, Typography, Button, Snackbar, Alert, Stack, Badge } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+
+//RRD
+import { useNavigate, Link } from 'react-router-dom';
+
+//User Context
+import { useUser } from '../hooks/UserContext';
+
+//Cart Context
+import { useCart } from '../hooks/CartContext';
+
+const Navbar = () => {
+    const { user, logout, loggedIn } = useUser();
+    const { totalQty } = useCart();
+
+    const storeName = 'Tienda Online';
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState(null);
+
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        // Realiza la lógica de cierre de sesión aquí
-        // Por ejemplo, limpiar las cookies y redirigir a la página de inicio
-        document.cookie = 'jwtToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        navigate('/');
+    const handleLogout = async () => {
+        try {
+            await logout();
+            handleClose();
+            navigate('/');
+            setOpen(true);
+            setMessage('Has cerrado sesión correctamente');
+        } catch (error) {
+            console.error('Error during logout:', error);
+            setError("Error al cerrar sesión. Recargando...");
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+        }
     };
 
-    return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div className="container-fluid">
-                <NavLink className="navbar-brand d-lg-none" to={"/"}>
-                    <img src={LogoMatePava} alt="logo mate" />
-                </NavLink>
-                <div className="ms-auto">
-                    <CartWidget />
-                </div>
-                <button
-                    className="navbar-toggler ms-auto"
-                    type="button text-light"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav mx-auto fs-3 ">
-                        <li className="nav-item">
-                            <NavLink to={"/destacados"} className="nav-link text-light" aria-current="page">Destacados</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink to={"/category/Mates"} className="nav-link text-light">Mates</NavLink>
-                        </li>
-                        <NavLink className="navbar-brand d-none d-lg-block" to={"/"}>
-                            <img src={LogoMatePava} alt="logo mate" />
-                        </NavLink>
-                        <li className="nav-item">
-                            <NavLink to={"/category/Materas"} className="nav-link text-light">Materas</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink to={"/category/Sets asador"} className="nav-link text-light">Sets Asador</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink to="/login" className="nav-link text-light">Login</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink to="/register" className="nav-link text-light">Register</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <button onClick={handleLogout} className="btn btn-dark">Logout</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    );
-};
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-export default NavBar;
+    const handleLogin = () => {
+        navigate('/login');
+    };
+
+    useEffect(() => {
+        if (loggedIn) {
+            setOpen(true);
+            setMessage('Has iniciado sesión correctamente');
+        }
+    }, [loggedIn]);
+
+    return (
+        <>
+            {
+                error && <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="error" variant="outlined" sx={{ width: '100%' }}>
+                        {error}
+                    </Alert >
+                </Snackbar >
+            }
+            {
+                open && <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" variant="outlined" sx={{ width: '100%' }}>
+                        {message}
+                    </Alert >
+                </Snackbar >
+            }
+            <AppBar position="sticky" style={{ backgroundColor: '#999' }}>
+                <Toolbar style={{ justifyContent: 'space-between' }}>
+                    <Typography variant="h6">
+                        <Link to={"/"}>{storeName}</Link>
+                    </Typography>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        {user ? (
+                            <>
+                                <Link to={"/cart"}>
+                                    <Stack spacing={2} direction="row" alignItems="center">
+                                        <Badge badgeContent={totalQty} color="success">
+                                            <ShoppingCartIcon color="action" />
+                                        </Badge>
+                                    </Stack>
+                                </Link>
+                                <PowerSettingsNewIcon color="inherit" onClick={handleLogout} style={{ cursor: 'pointer', marginLeft: '1.2rem' }} />
+                            </>
+                        ) : (
+                            <Button color="inherit" onClick={handleLogin}>
+                                Login
+                            </Button>
+                        )}
+                    </div>
+                </Toolbar>
+            </AppBar>
+        </>
+    )
+}
+
+export default Navbar

@@ -1,72 +1,134 @@
-import { useContext } from "react";
-import { CartContext } from "./context/CartContext";
-import trash from "./image/trash.svg";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useCart } from "../hooks/CartContext";
+import {
+    Card,
+    CardContent,
+    Typography,
+    Table,
+    TableContainer,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    IconButton,
+    Button,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Cart = () => {
-    const {cart, removeItem, clear, cartTotal, sumTotal} = useContext(CartContext)
+    const { cart, modifyProductQty, removeProductFromCart, checkoutCart, totalQty, totalAmount } =
+        useCart();
 
-    if(cartTotal() === 0){
-        return (
-            <div className="container my-5">
-                <div className="row text-center">
-                    <div className="col">
-                        <div className="alert alert-secondary" role="alert">
-                            Carrito Vacio.
-                        </div>
-                    </div>
+    const handleQuantityChange = (productId, newQuantity) => {
+        modifyProductQty(productId, newQuantity);
+    };
 
-                </div>
-            </div>
-        )
-    }
+    const handleRemoveProduct = (productId) => {
+        removeProductFromCart(productId);
+    };
 
+    const handleCheckout = () => {
+        checkoutCart();
+    };
+
+    const subtotal = totalAmount / 1.21;
+    const IVA = subtotal * 0.21;
 
     return (
-        <div className="container my-5">
-            <div className="row">
-                <div className="col text-center">
-                    <h1>Productos Seleccionados</h1>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col my-5">
-                    <table className="table">
-                        <tbody>
-                            {
-                                cart.map(item => (
-                                    <tr key={item.id}>
-                                        <td><img src={"/assets/images/" + item.imagen} alt={item.titulo} width={90} /></td>
-                                        <td className="align-middle">{item.titulo}</td>
-                                        <td className="align-middle">{item.quantity} x ${item.precioMay}</td>
-                                        <td className="align-middle text-center">${item.quantity * item.precioMay}</td>
-                                        <td className="align-middle text-end"><button className="btn btn-light" onClick={() => {removeItem(item.id)}} title="Eliminar Producto"><img src={trash} alt="Eliminar Producto" width={25} /></button></td>
-                                    </tr>
-                                ))
-                            }
-                            <tr>
-                                <td colSpan={3} className="align-middle text-end">Total a Pagar</td>
-                                <td className="text-center">${sumTotal()}</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div className="row">
-                        <div className="col text-end">
-                            <button className="btn btn-light" onClick={() => {clear()}} title="Vaciar Carrito">Vaciar Carrito</button>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col text-end py-2">
-                            <Link to = {"/checkout"}className="btn btn-light" title="Finalizar compra">Finalizar compra</Link>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-    )
-}
+        <Card elevation={3} style={{ margin: "20px" }}>
+            <CardContent>
+                <Typography variant="h5" gutterBottom>
+                    Tu carrito de compras
+                </Typography>
+                {cart.length > 0 ? (
+                    <>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Producto</TableCell>
+                                        <TableCell>Categoria</TableCell>
+                                        <TableCell align="right">Cantidad</TableCell>
+                                        <TableCell align="right">Precio</TableCell>
+                                        <TableCell align="right">Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {cart.map((product) => (
+                                        <TableRow key={product.id_prod._id}>
+                                            <TableCell>{product.id_prod.title}</TableCell>
+                                            <TableCell>{product.id_prod.category}</TableCell>
+                                            <TableCell align="right">{product.quantity}</TableCell>
+                                            <TableCell align="right">
+                                                {product.id_prod.price} USD
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <IconButton
+                                                    color="error"
+                                                    onClick={() =>
+                                                        handleRemoveProduct(product.id_prod._id)
+                                                    }>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    onClick={() =>
+                                                        handleQuantityChange(
+                                                            product.id_prod._id,
+                                                            product.quantity + 1
+                                                        )
+                                                    }>
+                                                    +
+                                                </Button>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    disabled={product.quantity === 1}
+                                                    onClick={() =>
+                                                        handleQuantityChange(
+                                                            product.id_prod._id,
+                                                            product.quantity - 1
+                                                        )
+                                                    }>
+                                                    -
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Typography align="right" variant="h6" style={{ marginTop: "20px" }}>
+                            Totales:
+                        </Typography>
+                        <Typography align="right" variant="body1">
+                            Total de unidades: {totalQty}
+                        </Typography>
+                        <Typography align="right" variant="body1">
+                            Subtotal: {subtotal.toFixed(2)} USD
+                        </Typography>
+                        <Typography align="right" variant="body1">
+                            IVA (21%): {IVA.toFixed(2)} USD
+                        </Typography>
+                        <Typography align="right" variant="body1">
+                            Total: {totalAmount} USD
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            onClick={handleCheckout}
+                            style={{ marginTop: "20px" }}>
+                            Checkout
+                        </Button>
+                    </>
+                ) : (
+                    <Typography variant="body1">Tu carrito está vacío.</Typography>
+                )}
+            </CardContent>
+        </Card>
+    );
+};
 
 export default Cart;

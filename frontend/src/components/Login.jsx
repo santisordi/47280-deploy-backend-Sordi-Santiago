@@ -1,53 +1,75 @@
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
 
-export const Login = () => {
-    const formRef = useRef(null); // Captura la referencia del formulario
-    const navigate = useNavigate()
+//MUI
+import { TextField, Button, Paper, Typography, Container, CssBaseline, Alert } from '@mui/material';
 
-    const handleSbmit =  async (e) => { //esto es para reemplasar el usestate y hacerlo mas rapido y simple
-        e.preventDefault(); 
-        const dataForm = new FormData(formRef.current);//transforma la data del form html en un objeto iterable
-        const data = Object.fromEntries(dataForm);  //dado un objeto iterator me lo transforma en una simple
-        
-        const response = await fetch('http://localhost:3000/api/session/login', {
-            method:'POST',    
-            headers: {
-                    'Content-type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
+//User Context
+import { useUser } from '../hooks/UserContext'
 
-            if (response.status === 200){
-                const datos = await response.json();
-                document.cookie = `jwtToken= ${datos.token}; expires=${new Date(Date.now() +1*24*60*60*1000).toUTCString()}; path=/`;
-                console.log(datos);  
-                navigate('/');  
-            } else {
-                console.log('login invalido')
-            };
+//RRD
+import { useNavigate, Link } from 'react-router-dom';
+
+const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const navigate = useNavigate();
+    const { login } = useUser();
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+            await login({ email, password });
+            navigate('/');
+
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <div className="text-center my-5">
-            <div className="container-fluid">
-                <h2>Formulario de Login</h2>
-                <form onSubmit={handleSbmit} ref={formRef}>
-                    <div className="mb-3">
-                        <label htmlFor="email">Ingrese su email</label>
-                        <input type="text" name="email" />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="password">Ingrese su contraseña</label>
-                        <input type="password" name="password" /> {/* Corrige el atributo name */}
-                    </div>
-                    <button type="submit" className="btn btn-dark">Iniciar sesión</button>
-                </form>
-            </div>
-        </div>
-
+        <Container component="main" maxWidth="xs" style={{ marginTop: '1.2rem' }}>
+            <CssBaseline />
+            {error && <Alert style={{ marginTop: '1.2rem' }} severity="error">{error}</Alert>}
+            <Paper elevation={3} style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1.2rem' }}>
+                <Typography variant="h5">Login</Typography>
+                <TextField
+                    label="Email"
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    label="Password"
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    fullWidth
+                    onClick={handleLogin}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Iniciando sesion...' : 'Login'}
+                </Button>
+                <Typography variant="body2" style={{ marginTop: '10px' }}>
+                    No tenes cuenta? <Link to="/register" style={{ color: 'grey' }}>Registrate aqui</Link>
+                </Typography>
+            </Paper>
+        </Container>
     );
 };
 
 export default Login;
-
